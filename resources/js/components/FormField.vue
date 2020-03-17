@@ -16,8 +16,8 @@
                     if (this.componentIsDependency(component)) {
                         if( component.selectedResourceId !== undefined ) {
                             // BelongsTo field
-                            component.$watch('selectedResourceId', this.dependencyWatcher, {immediate: true})
-                            this.dependencyWatcher(component.selectedResourceId)
+                            component.$watch('selectedResource', this.dependencyWatcher, {immediate: true})
+                            this.dependencyWatcher(component.selectedResource)
                         }
                         else if( component.value !== undefined ) {
                             // Text based fields
@@ -36,7 +36,8 @@
 
                 return component.field.attribute === this.field.dependsOn
             },
-            dependencyWatcher(value) {
+            dependencyWatcher(select) {
+                let value = select ? select.value : select
                 if(value === this.dependsOnValue) {
                     return
                 }
@@ -44,7 +45,9 @@
                 this.dependsOnValue = value
 
                 this.clearSelection()
-                this.initializeComponent()
+                setTimeout(() => {
+                    this.initializeComponent()
+				}, 300);
             },
         },
 
