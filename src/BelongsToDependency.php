@@ -15,31 +15,6 @@ class BelongsToDependency extends BelongsTo
     public $component = 'belongs-to-dependency';
 
     /**
-     * Resolve the field's value.
-     * This overrides the default function to fix the eager-loading issue:
-     * https://github.com/laravel/nova-issues/issues/246#issuecomment-452390026
-     *
-     * @param  mixed  $resource
-     * @param  string|null  $attribute
-     * @return void
-     */
-    public function resolve($resource, $attribute = null)
-    {
-        if (array_key_exists($this->attribute, $resource->getRelations()) && $resource->relationLoaded($this->attribute)) {
-            $value = $resource->{$this->attribute};
-        } else {
-            $value = $resource->{$this->attribute}()->withoutGlobalScopes()->setEagerLoads([])->first();
-        }
-
-        if ($value) {
-            $this->belongsToId = $value->getKey();
-
-            $this->value = $this->formatDisplayValue($value);
-        }
-    }
-
-
-    /**
      * Build an associatable query for the field.
      * Here is where we add the depends on value and filter results
      *
@@ -51,8 +26,10 @@ class BelongsToDependency extends BelongsTo
     {
         $query = parent::buildAssociatableQuery($request, $withTrashed);
 
-        if($request->has('dependsOnValue')) {
+        if ($request->has('dependsOnValue')) {
             $query->where($this->meta['dependsOnKey'], $request->dependsOnValue);
+        } else {
+            $query->where($this->meta['dependsOnKey'], '');
         }
 
         return $query;
