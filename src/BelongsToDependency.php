@@ -4,6 +4,8 @@ namespace Manmohanjit\BelongsToDependency;
 
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Laravel\Nova\Http\Requests\CreateResourceRequest;
+use Laravel\Nova\Http\Requests\UpdateResourceRequest;
 
 class BelongsToDependency extends BelongsTo
 {
@@ -29,7 +31,9 @@ class BelongsToDependency extends BelongsTo
         if ($request->has('dependsOnValue')) {
             $query->where($this->meta['dependsOnKey'], $request->dependsOnValue);
         } else {
-            $query->where($this->meta['dependsOnKey'], '');
+            if (!$request instanceof CreateResourceRequest && !$request instanceof UpdateResourceRequest) {
+                $query->where($this->meta['dependsOnKey'], '');
+            }
         }
 
         return $query;
